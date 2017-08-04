@@ -1,9 +1,20 @@
+@import url('https://fonts.googleapis.com/css?family=Righteous');
+@import url('https://fonts.googleapis.com/css?family=Saira+Semi+Condensed');
+
 html, body {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+	background-color: #ccc;
+	color: #2c3e50;
+}
+
+footer { font-family: 'Righteous', cursive; }
+footer a {
+	text-decoration: none;
+	color: #c0392b;
 }
 
 
@@ -20,8 +31,15 @@ html, body {
 		"green	green	red		red"
 		"yellow	yellow	blue	blue"
 		"yellow yellow	blue	blue";
+	margin: 5px;
+	border-radius: 50% 0 50% 0;
 }
 
+/* fonts */
+h1, button { font-family: 'Righteous', cursive;}
+button { color: #212f3d; } /* slightly darker than border */
+
+/* fixes */
 button:focus {outline: none; } /* removes android button highlight */
 button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highlight */
 
@@ -34,6 +52,9 @@ button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highl
 	height: 22.5vw;
 	margin: -5px;
 	font-size: 4vw;
+	box-shadow:
+		0 19px 38px rgba(0,0,0,0.30),
+		0 15px 12px rgba(0,0,0,0.22);
 }
 
 /* control blue button */
@@ -97,6 +118,10 @@ button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highl
 	height: 45vw;
 	margin: -5px;
 	border: 5px dashed #2c3e50;
+	box-shadow: 
+		0 19px 38px rgba(0,0,0,0.30),
+		0 15px 12px rgba(0,0,0,0.22),
+		inset -1px -6px 12px 0.1px rgba(0,0,0,0.40);
 }
 
 /* simon-green-button */
@@ -144,6 +169,7 @@ button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highl
 	border-bottom: 5px solid #2c3e50;
 	border-left: 5px dashed #2c3e50;
 	border-radius: 0 0 50% 0;
+
 	grid-area: blue;
 }
 
