@@ -21,7 +21,10 @@ html, body {
 	grid-template-columns: repeat(4, 21.5vw);
 	grid-template-rows: repeat(4, 21.5vw);
 	margin: 5px;
-	border-radius: 50% 0 50% 0;
+	border-radius: 25% 0 25% 0;
+	box-shadow: 
+		0 19px 38px rgba(0,0,0,0.30),
+		0 15px 12px rgba(0,0,0,0.22);
 }
 
 /* fonts / header styles */
@@ -117,10 +120,7 @@ button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highl
 	height: 45vw;
 	margin: -5px;
 	border: 5px dashed #2c3e50;
-	box-shadow: 
-		0 19px 38px rgba(0,0,0,0.30),
-		0 15px 12px rgba(0,0,0,0.22),
-		inset -1px -6px 12px 0.1px rgba(0,0,0,0.40);
+	box-shadow: inset -1px -6px 12px 0.1px rgba(0,0,0,0.40);
 	position: absolute;
 }
 
