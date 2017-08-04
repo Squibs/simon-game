@@ -11,13 +11,6 @@ html, body {
 	color: #2c3e50;
 }
 
-footer { font-family: 'Righteous', cursive; }
-footer a {
-	text-decoration: none;
-	color: #c0392b;
-}
-
-
 /* **********************
 	SIMON GENERAL STYLES
    ********************** */
@@ -35,9 +28,16 @@ footer a {
 	border-radius: 50% 0 50% 0;
 }
 
-/* fonts */
+/* fonts / header styles */
 h1, button { font-family: 'Righteous', cursive;}
 button { color: #212f3d; } /* slightly darker than border */
+
+/* footer styles */
+footer { font-family: 'Righteous', cursive; }
+footer a {
+	text-decoration: none;
+	color: #c0392b;
+}
 
 /* fixes */
 button:focus {outline: none; } /* removes android button highlight */
