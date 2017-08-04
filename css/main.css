@@ -22,9 +22,12 @@ html, body {
 		"yellow yellow	blue	blue";
 }
 
-button:focus { outline: none; } /* removes browser highlights on buttons */
+button:focus {outline: none; } /* removes browser highlights on buttons */
 
-button { font-size: 4vw; }
+button {
+	font-size: 4vw;
+	-webkit-tap-highlight-color: transparent; /* removes iOS button highlight */
+}
 
 
 /* ***********************
