@@ -12,9 +12,14 @@ html, body {
    ********************** */
 /* centers controls in center */
 .simon-container {
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	grid-template-rows: repeat(4, 1fr);
+	grid-template-areas:
+		"green	green	red		red"
+		"green	green	red		red"
+		"yellow	yellow	blue	blue"
+		"yellow yellow	blue	blue";
 }
 
 button:focus { outline: none; } /* removes browser highlights on buttons */
@@ -25,13 +30,9 @@ button { font-size: 4vw; }
 /* ***********************
 	SIMON CONTROL BUTTONS
    *********************** */
-.simon-controls-container {
-	position: absolute;
-}
-
 .simon-control {
-width: 20vw;
-height: 20vw;
+width: 22.5vw;
+height: 22.5vw;
 margin: -5px;
 border: 5px solid #2c3e50;
 }
@@ -39,6 +40,8 @@ border: 5px solid #2c3e50;
 #control-blue-button {
 	background-color: #2980b9;
 	border-radius: 5px 0 0 0;
+	grid-column: 2;
+	grid-row: 2;
 }
 
 #control-blue-button:active {
@@ -48,6 +51,8 @@ border: 5px solid #2c3e50;
 #control-yellow-button {
 	background-color: #f39c12;
 	border-radius: 0 5px 0 0;
+	grid-column: 3;
+	grid-row: 2;
 }
 
 #control-yellow-button:active {
@@ -57,6 +62,8 @@ border: 5px solid #2c3e50;
 #control-red-button {
 	background-color: #c0392b;
 	border-radius: 0 0 0 5px;
+	grid-column: 2;
+	grid-row: 3;
 }
 
 #control-red-button:active {
@@ -66,6 +73,8 @@ border: 5px solid #2c3e50;
 #control-green-button {
 	background-color: #27ae60;
 	border-radius: 0 0 5px 0;
+	grid-column: 3;
+	grid-row: 3;
 }
 
 #control-green-button:active {
@@ -76,11 +85,6 @@ border: 5px solid #2c3e50;
 /* ********************
 	SIMON GAME BUTTONS
    ******************** */
-.simon-buttons-container {
-	text-align: center;
-	margin: 5px;
-}
-
 .simon-button {
 	width: 45vw;
 	height: 45vw;
@@ -92,6 +96,7 @@ border: 5px solid #2c3e50;
 #simon-green-button {
 	background-color: #27ae60;
 	border-radius: 5px 0 0 0;
+	grid-area: green;
 }
 
 #simon-green-button:active {
@@ -102,6 +107,7 @@ border: 5px solid #2c3e50;
 #simon-red-button {
 	background-color: #c0392b;
 	border-radius: 0 5px 0 0;
+	grid-area: red;
 }
 
 #simon-red-button:active {
@@ -112,6 +118,7 @@ border: 5px solid #2c3e50;
 #simon-yellow-button {
 	background-color: #f39c12;
 	border-radius: 0 0 0 5px;
+	grid-area: yellow;
 }
 
 #simon-yellow-button:active {
@@ -122,6 +129,7 @@ border: 5px solid #2c3e50;
 #simon-blue-button {
 	background-color: #2980b9;
 	border-radius: 0 0 5px 0;
+	grid-area: blue;
 }
 
 #simon-blue-button:active {
@@ -134,13 +142,13 @@ border: 5px solid #2c3e50;
    *************** */
 @media (min-width: 800px) {
 	.simon-control {
-		width: 8vw;
-		height: 8vw;
+		width: 11vw;
+		height: 11vw;
 	}
 
 	.simon-button {
-		width: 20vw;
-		height: 20vw;
+		width: 22vw;
+		height: 22vw;
 	}
 
 	button { font-size: 1.5vw; }
