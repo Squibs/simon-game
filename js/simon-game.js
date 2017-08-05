@@ -31,6 +31,7 @@ class Simon {
     this.strictMode = false; // controls whether or not strict mode is enabled
     this.powerState = false; // controls whether the power has been turned on or not
     this.gameStart = false; // controls whether the game has started or not
+    this.lightShowLength = 4.00; // controls the length of the light show (in seconds)
 
     // audio files for each button
     this.greenAudio = new Audio('../media/simonSound1.mp3');
@@ -103,6 +104,40 @@ class Simon {
     }
   }
 
+  lightShow() {
+    const that = this;
+    const enableLight = function (light) {
+      that.buttons[light].classList.add('active');
+    };
+
+    const disableLight = function (light) {
+      that.buttons[light].classList.remove('active');
+    };
+
+    // enable lights clockwise
+    setTimeout(() => { enableLight(0); }, 0);
+    setTimeout(() => { enableLight(1); }, 35);
+    setTimeout(() => { enableLight(2); }, 70);
+    setTimeout(() => { enableLight(3); }, 105);
+    setTimeout(() => { enableLight(4); }, 140);
+    setTimeout(() => { enableLight(5); }, 175);
+    setTimeout(() => { enableLight(6); }, 210);
+    setTimeout(() => { enableLight(7); }, 245);
+
+    // disable lights anti-clockwise
+    setTimeout(() => { disableLight(7); }, 300);
+    setTimeout(() => { disableLight(6); }, 335);
+    setTimeout(() => { disableLight(5); }, 370);
+    setTimeout(() => { disableLight(4); }, 405);
+    setTimeout(() => { disableLight(3); }, 440);
+    setTimeout(() => { disableLight(2); }, 475);
+    setTimeout(() => { disableLight(1); }, 510);
+    setTimeout(() => { disableLight(0); }, 545);
+
+    // turn power button light on once show is done
+    setTimeout(() => { enableLight(4); }, 600);
+  }
+
   // turns the device on and off
   togglePowerState() {
     // toggles powerstate
@@ -111,9 +146,11 @@ class Simon {
     // stores the blue control button (DOM element)
     const powerButton = document.getElementById('control-blue-button');
 
-    // add or remove active state for the blue control button (lights the button up)
     // if power is on
     if (this.powerState === true) {
+      // do a light show!
+      this.lightShow();
+
       // change button text to 'on'; light up button
       powerButton.innerHTML = 'On<br><i class="fa fa-2x fa-power-off"></i>';
       powerButton.classList.add('active');
@@ -172,9 +209,9 @@ class Simon {
 }
 
 
-/* **********************************************
-    CREATE GAME OBJECT & CREATE BUTTON LISTENERS
-   ********************************************** */
+/* ***************************************
+    CREATE GAME OBJECT & BUTTON LISTENERS
+   *************************************** */
 // creates a simon class object
 const simon = new Simon();
 console.log(simon);
@@ -200,4 +237,7 @@ for (let i = 0; i < buttons.length; i += 1) {
 
       - Switch audio to AudioContext sounds (AudioContext.createOscillator())
         + (https://developer.mozilla.org/en-US/docs/Web/API/AudioContext)
+
+      - Possibly adjust button colors
+        + make lit up buttons stand out more
    ************************************************************************************* */
