@@ -31,6 +31,8 @@ class Simon {
     this.strictMode = false; // controls whether or not strict mode is enabled
     this.powerState = false; // controls whether the power has been turned on or not
     this.gameStart = false; // controls whether the game has started or not
+    this.flashTimer = ''; // stores flashInverval
+    this.flashEnabled = false; // controls whether the count button is flashing or not
 
     // audio files for each button
     this.greenAudio = new Audio('../media/simonSound1.mp3');
@@ -46,6 +48,104 @@ class Simon {
     for (let i = 0; i < this.buttons.length; i += 1) {
       this.buttons[i].disabled = true;
       this.buttons[4].disabled = false;
+    }
+  }
+
+  // resets everything to default; then generates a new game
+  resetGame() {
+    this.gameSeed = '';
+    this.currentString = '';
+    this.generateGameSeed();
+  }
+
+  // generates a game string
+  generateGameSeed() {
+    // generate new game seed
+    for (let i = 0; i <= 20; i += 1) {
+      this.gameSeed += this.gameButtons[Math.floor(Math.random() * 4)];
+    }
+  }
+
+  // handles what happens when any game button is pressed
+  gameButtonPressed(buttonPressed) {
+    this.currentString += buttonPressed;
+  }
+
+  // handles what happens when any control button is pressed
+  controlButtonPressed(buttonPressed) {
+    if (buttonPressed === 'power') {
+      this.togglePowerState();
+    } else if (buttonPressed === 'start') {
+      this.resetGame();
+    } else if (buttonPressed === 'strict') {
+      this.toggleStrictMode();
+    } else if (buttonPressed === 'count') {
+      // do something
+    }
+  }
+
+  // toggles whether the game has started
+  toggleGameStart() {
+
+  }
+
+  // toggles strict mode on or off
+  toggleStrictMode() {
+    // toggles strict mode
+    this.strictMode = this.strictMode === false;
+
+    // stores the red control button (DOM element)
+    const strictButton = document.getElementById('control-red-button');
+
+    // add or remove active state for the red control button (lights the button up)
+    if (this.strictMode === true) {
+      strictButton.classList.add('active');
+    } else if (this.strictMode === false) {
+      strictButton.classList.remove('active');
+    }
+  }
+
+  // turns the device on and off
+  togglePowerState() {
+    // toggles powerstate
+    this.powerState = this.powerState === false;
+
+    // stores the blue control button (DOM element)
+    const powerButton = document.getElementById('control-blue-button');
+
+    // if power is on
+    if (this.powerState === true) {
+      // do a light show!
+      this.lightShow();
+
+      // enable the flashing of count
+      this.flashTimer = setInterval(() => { this.flashCount(); }, 1500);
+
+      // change button text to 'on'; light up button
+      powerButton.innerHTML = 'On<br><i class="fa fa-2x fa-power-off"></i>';
+      powerButton.classList.add('active');
+
+      // enable control buttons
+      for (let i = 5; i < this.buttons.length; i += 1) {
+        this.buttons[i].disabled = false;
+        this.buttons[i].classList.add('cursor');
+        this.buttons[i].classList.add('hasactive');
+      }
+    // if power is off
+    } else if (this.powerState === false) {
+      // disable the flashing of count
+      clearInterval(this.flashTimer);
+
+      // change button text to 'off'; turn button light off
+      powerButton.innerHTML = 'Off<br><i class="fa fa-2x fa-power-off"></i>';
+      powerButton.classList.remove('active');
+
+      // disable control buttons
+      for (let i = 5; i < this.buttons.length; i += 1) {
+        this.buttons[i].disabled = true;
+        this.buttons[i].classList.remove('cursor');
+        this.buttons[i].classList.remove('hasactive');
+      }
     }
   }
 
@@ -85,24 +185,19 @@ class Simon {
     }
   }
 
-  // handles what happens when any game button is pressed
-  gameButtonPressed(buttonPressed) {
-    this.currentString += buttonPressed;
-  }
+  // flashes count until game is started
+  flashCount() {
+    const that = this;
 
-  // handles what happens when any control button is pressed
-  controlButtonPressed(buttonPressed) {
-    if (buttonPressed === 'power') {
-      this.togglePowerState();
-    } else if (buttonPressed === 'start') {
-      this.resetGame();
-    } else if (buttonPressed === 'strict') {
-      this.toggleStrictMode();
-    } else if (buttonPressed === 'count') {
-      // do something
+    console.log('tick');
+
+    if (this.powerState && !this.gameStart) {
+      setTimeout(() => { that.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-points">&nbsp&nbsp</span>'; }, 0);
+      setTimeout(() => { that.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-points">--</span>'; }, 650);
     }
   }
 
+  // light show shown when game is turned on
   lightShow() {
     // stores simon object
     const that = this;
@@ -135,77 +230,8 @@ class Simon {
     setTimeout(() => { enableLight(7); }, 350);
     setTimeout(() => { disableLight(7); }, 400);
 
-    // turn power button light on once show is done
-    setTimeout(() => { enableLight(4); }, 450);
-  }
-
-  // turns the device on and off
-  togglePowerState() {
-    // toggles powerstate
-    this.powerState = this.powerState === false;
-
-    // stores the blue control button (DOM element)
-    const powerButton = document.getElementById('control-blue-button');
-
-    // if power is on
-    if (this.powerState === true) {
-      // do a light show!
-      this.lightShow();
-
-      // change button text to 'on'; light up button
-      powerButton.innerHTML = 'On<br><i class="fa fa-2x fa-power-off"></i>';
-      powerButton.classList.add('active');
-
-      // enable control buttons
-      for (let i = 5; i < this.buttons.length; i += 1) {
-        this.buttons[i].disabled = false;
-        this.buttons[i].classList.add('cursor');
-        this.buttons[i].classList.add('hasactive');
-      }
-    // if power is off
-    } else if (this.powerState === false) {
-      // change button text to 'off'; turn button light off
-      powerButton.innerHTML = 'Off<br><i class="fa fa-2x fa-power-off"></i>';
-      powerButton.classList.remove('active');
-
-      // disable control buttons
-      for (let i = 5; i < this.buttons.length; i += 1) {
-        this.buttons[i].disabled = true;
-        this.buttons[i].classList.remove('cursor');
-        this.buttons[i].classList.remove('hasactive');
-      }
-    }
-  }
-
-  // resets everything to default; then generates a new game
-  resetGame() {
-    this.gameSeed = '';
-    this.currentString = '';
-    this.generateGameSeed();
-  }
-
-  // toggles strict mode on or off
-  toggleStrictMode() {
-    // toggles strict mode
-    this.strictMode = this.strictMode === false;
-
-    // stores the red control button (DOM element)
-    const strictButton = document.getElementById('control-red-button');
-
-    // add or remove active state for the red control button (lights the button up)
-    if (this.strictMode === true) {
-      strictButton.classList.add('active');
-    } else if (this.strictMode === false) {
-      strictButton.classList.remove('active');
-    }
-  }
-
-  // generates a game string
-  generateGameSeed() {
-    // generate new game seed
-    for (let i = 0; i <= 20; i += 1) {
-      this.gameSeed += this.gameButtons[Math.floor(Math.random() * 4)];
-    }
+    // fix power button light depending on power state (is there a better way to write this line?)
+    setTimeout(() => { that.powerState ? enableLight(4) : disableLight(4); }, 450); // eslint-disable-line
   }
 }
 
@@ -215,7 +241,6 @@ class Simon {
    *************************************** */
 // creates a simon class object
 const simon = new Simon();
-console.log(simon);
 
 // stores HTMLCollection of all buttons in variable 'buttons'
 const buttons = document.getElementsByTagName('button');
@@ -241,4 +266,6 @@ for (let i = 0; i < buttons.length; i += 1) {
 
       - Possibly adjust button colors
         + make lit up buttons stand out more
+
+      - On victory spam last color a few times then change count to '**'
    ************************************************************************************* */
