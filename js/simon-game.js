@@ -104,35 +104,39 @@ class Simon {
   }
 
   lightShow() {
+    // stores simon object
     const that = this;
+
+    // enables lights
     const enableLight = function (light) {
       that.buttons[light].classList.add('active');
     };
 
+    // disables lights
     const disableLight = function (light) {
       that.buttons[light].classList.remove('active');
     };
 
-    // enable / disable lights clockwise
+    // enable / disable lights clockwise (appears semi-sporadic on mobile)
     setTimeout(() => { enableLight(0); }, 0);
-    setTimeout(() => { disableLight(0); }, 35);
-    setTimeout(() => { enableLight(1); }, 35);
-    setTimeout(() => { disableLight(1); }, 70);
-    setTimeout(() => { enableLight(2); }, 70);
-    setTimeout(() => { disableLight(2); }, 105);
-    setTimeout(() => { enableLight(3); }, 105);
-    setTimeout(() => { disableLight(3); }, 140);
-    setTimeout(() => { enableLight(4); }, 140);
-    setTimeout(() => { disableLight(4); }, 175);
-    setTimeout(() => { enableLight(5); }, 175);
-    setTimeout(() => { disableLight(5); }, 210);
-    setTimeout(() => { enableLight(6); }, 210);
-    setTimeout(() => { disableLight(6); }, 245);
-    setTimeout(() => { enableLight(7); }, 245);
-    setTimeout(() => { disableLight(7); }, 280);
+    setTimeout(() => { disableLight(0); }, 50);
+    setTimeout(() => { enableLight(1); }, 50);
+    setTimeout(() => { disableLight(1); }, 100);
+    setTimeout(() => { enableLight(2); }, 100);
+    setTimeout(() => { disableLight(2); }, 150);
+    setTimeout(() => { enableLight(3); }, 150);
+    setTimeout(() => { disableLight(3); }, 200);
+    setTimeout(() => { enableLight(4); }, 200);
+    setTimeout(() => { disableLight(4); }, 250);
+    setTimeout(() => { enableLight(5); }, 250);
+    setTimeout(() => { disableLight(5); }, 300);
+    setTimeout(() => { enableLight(6); }, 300);
+    setTimeout(() => { disableLight(6); }, 350);
+    setTimeout(() => { enableLight(7); }, 350);
+    setTimeout(() => { disableLight(7); }, 400);
 
     // turn power button light on once show is done
-    setTimeout(() => { enableLight(4); }, 350);
+    setTimeout(() => { enableLight(4); }, 450);
   }
 
   // turns the device on and off
