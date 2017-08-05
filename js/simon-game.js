@@ -31,7 +31,6 @@ class Simon {
     this.strictMode = false; // controls whether or not strict mode is enabled
     this.powerState = false; // controls whether the power has been turned on or not
     this.gameStart = false; // controls whether the game has started or not
-    this.lightShowLength = 4.00; // controls the length of the light show (in seconds)
 
     // audio files for each button
     this.greenAudio = new Audio('../media/simonSound1.mp3');
@@ -114,28 +113,26 @@ class Simon {
       that.buttons[light].classList.remove('active');
     };
 
-    // enable lights clockwise
+    // enable / disable lights clockwise
     setTimeout(() => { enableLight(0); }, 0);
+    setTimeout(() => { disableLight(0); }, 35);
     setTimeout(() => { enableLight(1); }, 35);
+    setTimeout(() => { disableLight(1); }, 70);
     setTimeout(() => { enableLight(2); }, 70);
+    setTimeout(() => { disableLight(2); }, 105);
     setTimeout(() => { enableLight(3); }, 105);
+    setTimeout(() => { disableLight(3); }, 140);
     setTimeout(() => { enableLight(4); }, 140);
+    setTimeout(() => { disableLight(4); }, 175);
     setTimeout(() => { enableLight(5); }, 175);
+    setTimeout(() => { disableLight(5); }, 210);
     setTimeout(() => { enableLight(6); }, 210);
+    setTimeout(() => { disableLight(6); }, 245);
     setTimeout(() => { enableLight(7); }, 245);
-
-    // disable lights anti-clockwise
-    setTimeout(() => { disableLight(7); }, 300);
-    setTimeout(() => { disableLight(6); }, 335);
-    setTimeout(() => { disableLight(5); }, 370);
-    setTimeout(() => { disableLight(4); }, 405);
-    setTimeout(() => { disableLight(3); }, 440);
-    setTimeout(() => { disableLight(2); }, 475);
-    setTimeout(() => { disableLight(1); }, 510);
-    setTimeout(() => { disableLight(0); }, 545);
+    setTimeout(() => { disableLight(7); }, 280);
 
     // turn power button light on once show is done
-    setTimeout(() => { enableLight(4); }, 600);
+    setTimeout(() => { enableLight(4); }, 350);
   }
 
   // turns the device on and off
