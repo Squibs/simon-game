@@ -38,6 +38,9 @@ footer a {
 	color: #c0392b;
 }
 
+/* changes cursor to pointer for enabled buttons */
+.cursor { cursor: pointer; }
+
 /* fixes */
 button:focus {outline: none; } /* removes android button highlight */
 button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highlight */
@@ -60,7 +63,8 @@ button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highl
 }
 
 /* control blue button */
-#control-blue-button:active { background-color: #3498db; }
+#control-blue-button.hasactive:active { background-color: #3498db; }
+#control-blue-button.active { background-color: #3498db; }
 #control-blue-button {
 	background-color: #2980b9;
 	border-top: 5px dashed #2c3e50;
@@ -73,7 +77,8 @@ button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highl
 }
 
 /* control yellow button */
-#control-yellow-button:active { background-color: #f1c40f; }
+#control-yellow-button.hasactive:active { background-color: #f1c40f; }
+#control-yellow-button.active { background-color: #f1c40f; }
 #control-yellow-button {
 	background-color: #f39c12;
 	border-top: 5px dashed #2c3e50;
@@ -86,7 +91,8 @@ button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highl
 }
 
 /* control red button */
-#control-red-button:active { background-color: #e74c3c; }
+#control-red-button.hasactive:active { background-color: #e74c3c; }
+#control-red-button.active { background-color: #e74c3c; }
 #control-red-button {
 	background-color: #c0392b;
 	border-top: 5px solid #2c3e50;
@@ -99,7 +105,8 @@ button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highl
 }
 
 /* control green button */
-#control-green-button:active { background-color: #2ecc71; }
+#control-green-button.hasactive:active { background-color: #2ecc71; }
+#control-green-button.active { background-color: #2ecc71; }
 #control-green-button {
 	background-color: #27ae60;
 	border-top: 5px solid #2c3e50;
@@ -125,7 +132,8 @@ button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highl
 }
 
 /* simon-green-button */
-#simon-green-button:active { background-color: #2ecc71; }
+#simon-green-button.hasactive:active { background-color: #2ecc71; }
+#simon-green-button.active { background-color: #2ecc71; }
 #simon-green-button {
 	background-color: #27ae60;
 	border-top: 5px solid #2c3e50;
@@ -138,7 +146,8 @@ button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highl
 }
 
 /* simon-red-button */
-#simon-red-button:active { background-color: #e74c3c; }
+#simon-red-button.hasactive:active { background-color: #e74c3c; }
+#simon-red-button.active { background-color: #e74c3c; }
 #simon-red-button {
 	background-color: #c0392b;
 	border-top: 5px solid #2c3e50;
@@ -151,9 +160,10 @@ button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highl
 }
 
 /* simon-yellow-button */
-#simon-yellow-button:active { background-color: #f1c40f; }
+#simon-yellow-button.hasactive:active { background-color: #f1c40f; }
+#simon-yellow-button.active { background-color: #f1c40f; }
 #simon-yellow-button {
-	background-color: #F39C12;
+	background-color: #f39c12;
 	border-top: 5px dashed #2c3e50;
 	border-right: 5px dashed #2c3e50;
 	border-bottom: 5px solid #2c3e50;
@@ -164,7 +174,8 @@ button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highl
 }
 
 /* simon-blue-button */
-#simon-blue-button:active { background-color: #3497DB; }
+#simon-blue-button.hasactive:active { background-color: #3497DB; }
+#simon-blue-button.active { background-color: #3497DB; }
 #simon-blue-button {
 	background-color: #2980b9;
 	border-top: 5px dashed #2c3e50;
@@ -197,3 +208,26 @@ button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highl
 		height: 22vw;
 	}
 }
+
+/* ********
+	COLORS
+   ******** */
+/* GREENS */
+/* #27ae60 - green
+   #2ecc71 - light green */
+
+/* REDS */
+/* #c0392b - red 
+   #e74c3c - light red */
+
+/* YELLOWS */
+/* #f39c12 - yellow
+   #f1c40f - light yellow */
+
+/* BLUES */
+/* #2980b9 - blue
+   #3498db - light blue */
+
+/* OTHERS */
+/* #2ecc71 - border / font color
+   #cccccc - background color */
