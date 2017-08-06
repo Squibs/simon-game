@@ -29,8 +29,11 @@ class Simon {
     this.gameSeed = ''; // order in which buttons need to be pressed
     this.gameSeedVariables = ['g', 'r', 'y', 'b']; // stores game seed variables
     this.playerInput = ''; // stores what the player has entered
-    this.roundCount = 0; // counts which roud the player is on
+    this.computerInput = ''; // controls the current stage of the game
     this.flashTimer = ''; // stores flashInterval
+    this.patternTimer = ''; // stores patternInterval
+    this.roundCount = 0; // counts which roud the player is on
+    this.gameSpeed = 800; // how fast the game pattern will play (in milliseconds)
 
     // stores HTMLCollection of all buttons
     this.buttons = document.getElementsByTagName('button');
@@ -56,9 +59,9 @@ class Simon {
     this.disableControlButtons(true);
   }
 
-  /* ********************************
-      GAME / CONTROL BUTTON HANDLING
-     ******************************** */
+  /* ****************************************
+      GAME / CONTROL BUTTON HANDLING METHODS
+     **************************************** */
   // handles button input
   createButtonListeners() {
     const buttonHandlerSwitch = function (button) {
@@ -103,7 +106,8 @@ class Simon {
     const cloneAudio = this.audio[button].cloneNode(true);
     cloneAudio.play();
 
-    console.log(button);
+    this.playerTurn();
+    console.log(this);
   }
 
   // handles option / control buttons
@@ -135,6 +139,16 @@ class Simon {
     // handles the start button
     const startButtonHandler = function () {
       this.toggleControlState('gameStarted');
+
+      // if the game is started
+      if (this.toggles.gameStarted) {
+        // start the game
+        this.startGame();
+
+      // if the game button is pressed while a game is already started
+      } else {
+        // !!!!!!!!!!!!!!!!!!!!do something
+      }
     }.bind(this);
 
     // handles the strict button
@@ -144,10 +158,8 @@ class Simon {
 
     // handles the count button
     const countButtonHandler = function () {
-      // do something
+      // !!!!!!!!!!!!!!!!!!do something
     }.bind(this);
-
-    console.log(button, 'control');
 
     // call the appropriate function based on the button
     if (button === 'b') {
@@ -185,10 +197,21 @@ class Simon {
     }
   }
 
-  // disables or enables game buttons baed on passed boolean
+  // disables or enables game buttons based on passed boolean
   disableGameButtons(bool) {
     for (let i = 0; i < 4; i += 1) {
       this.buttons[i].disabled = bool;
+
+      // if buttons are enabled: add hand cursor and light up when clicked
+      if (!bool) {
+        this.buttons[i].classList.add('cursor');
+        this.buttons[i].classList.add('hasactive');
+
+      // if buttons are disabled: remove hand cursor and light up when clicked
+      } else {
+        this.buttons[i].classList.remove('cursor');
+        this.buttons[i].classList.remove('hasactive');
+      }
     }
   }
 
@@ -210,31 +233,141 @@ class Simon {
         this.buttons[i].classList.remove('active');
 
         // set everything to default (only time buttons are disabled is when power is off)
+        this.disableGameButtons(true);
         this.toggles.powerState = false;
         this.toggles.gameStarted = false;
         this.toggles.strictMode = false;
+        this.computerInput = '';
         this.playerInput = '';
         this.gameSeed = '';
         this.roundCount = 0;
         this.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-points">--</span>';
+        this.patternTimer = '';
+        this.flashTimer = '';
       }
     }
   }
 
 
-/* **********************
-   ********************** */
-  // generates a game string
-  generateGameSeed() {
-    // clear existing seed
+  /* ********************
+      GAME LOGIC METHODS
+     ******************** */
+  // starts the game
+  startGame() {
+    // clear existing seed and other game variables
     this.gameSeed = '';
+    this.playerInput = '';
+    this.computerInput = '';
+    this.roundCount = 0;
 
     // generate new game seed
     for (let i = 0; i < 20; i += 1) {
       this.gameSeed += this.gameSeedVariables[Math.floor(Math.random() * 4)];
     }
+
+    // add one to the round cunter
+    console.log(this.gameSeed);
+    this.addRoundCount();
   }
 
+  // adds to the round counter
+  addRoundCount() {
+    // add one to the round counter; update round counter DOM element; generate a move
+    this.roundCount += 1;
+    document.getElementById('simon-points').innerText = Simon.formatRoundNumber(this.roundCount);
+    setTimeout(() => { this.generateMove(); }, 150);
+  }
+
+  // pulls the next game move (pattern sequence)
+  generateMove() {
+    // pull next move from already generated game seed
+    this.computerInput += this.gameSeed.slice(0, 1);
+    this.gameSeed = this.gameSeed.slice(1, this.gameSeed.length - 1);
+    this.displayRoundPattern();
+  }
+
+  // displays the current round's pattern
+  displayRoundPattern() {
+    // disable player input
+    this.disableGameButtons(true);
+
+    // control for the following setInterval
+    let i = 0;
+
+    // display each bit of the pattern based on gameSpeed variable
+    this.patternTimer = setInterval(() => {
+      this.playGame(this.computerInput[i]);
+      i += 1;
+
+      // once pattern has completely played out
+      if (i >= this.computerInput.length) {
+        // stop the interval (stops pattern from playing)
+        clearInterval(this.patternTimer);
+
+        // re-enable player controls
+        this.disableGameButtons(false);
+      }
+    }, this.gameSpeed);
+
+    // clear player input
+    this.playerInput = '';
+  }
+
+  // plays out the pattern based on the computerInput variable
+  playGame(color) {
+    // clone the original audio node for the passed color and play it (allows audio overlap)
+    const cloneAudio = this.audio[color].cloneNode(true);
+    cloneAudio.play();
+
+    console.log('playGame tick');
+
+    // light up the appropriate button
+    if (color === 'g') {
+      this.buttons[0].classList.add('active');
+    } else if (color === 'r') {
+      this.buttons[1].classList.add('active');
+    } else if (color === 'y') {
+      this.buttons[2].classList.add('active');
+    } else if (color === 'b') {
+      this.buttons[3].classList.add('active');
+    }
+
+    // disable the light after a short amount of time
+    for (let i = 0; i < 4; i += 1) {
+      setTimeout(() => { this.buttons[i].classList.remove('active'); }, 175);
+    }
+  }
+
+  // logic for when it is the players turn
+  playerTurn() {
+    // stores length of the playerInput variable to make 'if' statement readable
+    const length = this.playerInput.length - 1;
+
+    // if incorrect piece of the pattern was entered
+    if (this.playerInput[length] !== this.computerInput[length]) {
+      // if strict mode is enabled
+      if (this.toggles.strictMode) {
+        // !!!!!!!!!!!!insert mistake handling method here
+        this.startGame();
+      // reshow the pattern to the player
+      } else {
+        this.displayRoundPattern();
+      }
+    // if entire player input was correct and the length matches that of the computer's input
+    } else if (this.playerInput.length === this.computerInput.length) {
+      // if the round count is at 20 the player wins!
+      if (this.roundCount === 20) {
+        // you win!!!!!!!!!!! (insert winning method here)
+      // otherwise go to the next round
+      } else {
+        this.addRoundCount();
+      }
+    }
+  }
+
+  /* *********************
+      FANCY LIGHT METHODS
+     ********************* */
   // flashes the round count until the game is started
   flashCount() {
     if (this.toggles.powerState && !this.toggles.gameStarted) {
@@ -243,6 +376,8 @@ class Simon {
     } else {
       clearInterval(this.flashTimer);
     }
+
+    console.log('flashCount tick');
   }
 
   // little light show when game is powered on
@@ -277,6 +412,16 @@ class Simon {
 
     // fix power button light depending on power state
     setTimeout(() => { this.toggles.powerState ? enableLight(4) : disableLight(4); }, 450); // eslint-disable-line
+  }
+
+  /* ****************
+      STATIC METHODS
+     **************** */
+  // formats the round number to always be two digits (00 thrugh 20)
+  static formatRoundNumber(round) {
+    // if less than 10 add '0' in front of round number; return as string
+    if (round < 10) { return `0${round}`; }
+    return round.toString();
   }
 }
 
