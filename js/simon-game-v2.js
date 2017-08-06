@@ -247,8 +247,8 @@ class Simon {
         this.gameSeed = '';
         this.roundCount = 0;
         this.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-points">--</span>';
-        this.patternTimer = '';
-        this.flashTimer = '';
+        clearInterval(this.patternTimer);
+        clearInterval(this.flashTimer);
       }
     }
   }
@@ -320,11 +320,10 @@ class Simon {
 
   // plays out the pattern based on the computerInput variable
   playGame(color) {
+    console.log('playGame tick');
     // clone the original audio node for the passed color and play it (allows audio overlap)
     const cloneAudio = this.audio[color].cloneNode(true);
     cloneAudio.play();
-
-    console.log('playGame tick');
 
     // light up the appropriate button
     if (color === 'g') {
