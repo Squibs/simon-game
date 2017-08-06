@@ -9,4 +9,12 @@ A Simon Says game I have created while going through the advanced front end deve
 
 <em>Completed</em>
 
+Learnt a lot about event listeners
+	- passing the event, event target, passing this.value vs event.target.value (or event.currentTarget.value)
+	- setTimeout() and setInterval()
+	- in general a lot more about javascript classes
+	- object literals
+	- using 'this' in general
+	- using .bind / .bind(this)
+
 <img src="https://cdn.rawgit.com/Squibs/Squibs.github.io/1bdd9917/img/icon-html5.svg" height="40" alt="HTML5 Icon"/>   <img src="https://cdn.rawgit.com/Squibs/Squibs.github.io/1bdd9917/img/icon-css3.svg" height="40" alt="CSS3 Icon"/>     <img src="https://cdn.rawgit.com/Squibs/Squibs.github.io/master/img/icon-javascript.svg" height="40" alt="JavaScript Icon"/>

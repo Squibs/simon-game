@@ -19,7 +19,7 @@
         + stays lit-up when enabled
 
       - Count button
-        + displays the current score / correct button press count
+        + displays the current round / correct button press count
         + when this button is pressed it does nothing!
           = or it switches to display something else (WIP)
    ****************************************************************** */
@@ -28,11 +28,17 @@ class Simon {
     this.gameSeedValues = ['g', 'r', 'y', 'b']; // stores game seed values
     this.gameSeed = ''; // order in which buttons need to be pressed
     this.currentString = ''; // stores buttons that have already been pressed
+    this.flashTimer = ''; // stores flashInverval
     this.strictMode = false; // controls whether or not strict mode is enabled
     this.powerState = false; // controls whether the power has been turned on or not
-    this.gameStart = false; // controls whether the game has started or not
-    this.flashTimer = ''; // stores flashInverval
+    this.gameStarted = false; // controls whether the game has started or not
     this.flashEnabled = false; // controls whether the count button is flashing or not
+    this.roundCount = 0; // counts which round the player is on
+    this.gameSpeed = 1000; // how fast the game pattern will play (in milliseconds)
+    this.playerMoves = [];
+
+    // stores HTMLCollection of all buttons in variable 'buttons'
+    this.buttons = document.getElementsByTagName('button');
 
     // audio files for each button
     this.greenAudio = new Audio('../media/simonSound1.mp3');
@@ -41,9 +47,6 @@ class Simon {
     this.blueAudio = new Audio('../media/simonSound4.mp3');
     this.errorAudio = new Audio('../media/bzzzt.mp3');
 
-    // stores HTMLCollection of all buttons in variable 'buttons'
-    this.buttons = document.getElementsByTagName('button');
-
     // disable all buttons initially; except power
     for (let i = 0; i < this.buttons.length; i += 1) {
       this.buttons[i].disabled = true;
@@ -51,42 +54,24 @@ class Simon {
     }
   }
 
-  // resets everything to default; then generates a new game
-  resetGame() {
-    this.gameSeed = '';
-    this.currentString = '';
-    this.generateGameSeed();
-  }
-
-  // generates a game string
-  generateGameSeed() {
-    // generate new game seed
-    for (let i = 0; i <= 20; i += 1) {
-      this.gameSeed += this.gameButtons[Math.floor(Math.random() * 4)];
-    }
-  }
-
-  // handles what happens when any game button is pressed
-  gameButtonPressed(buttonPressed) {
-    this.currentString += buttonPressed;
-  }
-
-  // handles what happens when any control button is pressed
-  controlButtonPressed(buttonPressed) {
-    if (buttonPressed === 'power') {
-      this.togglePowerState();
-    } else if (buttonPressed === 'start') {
-      this.resetGame();
-    } else if (buttonPressed === 'strict') {
-      this.toggleStrictMode();
-    } else if (buttonPressed === 'count') {
-      // do something
-    }
-  }
-
+  /* ****************
+      BUTTON TOGGLES
+     **************** */
   // toggles whether the game has started
-  toggleGameStart() {
+  toggleGameStarted() {
+    // toggles game started
+    this.gameStarted = this.gameStarted === false;
 
+    // if the game is set to run
+    if (this.gameStarted) {
+      this.buttons[5].classList.add('active');
+      setTimeout(() => { document.getElementById('simon-points').innerText = Simon.formatRoundNumber(1); }, 525);
+      this.generateGameSeed();
+      this.addCount();
+    // reset the game and start a new one
+    } else if (!this.gameStarted) {
+      this.buttons[5].classList.remove('active');
+    }
   }
 
   // toggles strict mode on or off
@@ -94,14 +79,11 @@ class Simon {
     // toggles strict mode
     this.strictMode = this.strictMode === false;
 
-    // stores the red control button (DOM element)
-    const strictButton = document.getElementById('control-red-button');
-
     // add or remove active state for the red control button (lights the button up)
-    if (this.strictMode === true) {
-      strictButton.classList.add('active');
-    } else if (this.strictMode === false) {
-      strictButton.classList.remove('active');
+    if (this.strictMode) {
+      this.buttons[6].classList.add('active');
+    } else if (!this.strictMode) {
+      this.buttons[6].classList.remove('active');
     }
   }
 
@@ -110,20 +92,17 @@ class Simon {
     // toggles powerstate
     this.powerState = this.powerState === false;
 
-    // stores the blue control button (DOM element)
-    const powerButton = document.getElementById('control-blue-button');
-
     // if power is on
-    if (this.powerState === true) {
+    if (this.powerState) {
       // do a light show!
       this.lightShow();
 
       // enable the flashing of count
-      this.flashTimer = setInterval(() => { this.flashCount(); }, 1500);
+      this.flashTimer = setInterval(() => { this.flashCount(); }, 1000);
 
       // change button text to 'on'; light up button
-      powerButton.innerHTML = 'On<br><i class="fa fa-2x fa-power-off"></i>';
-      powerButton.classList.add('active');
+      this.buttons[4].innerHTML = 'On<br><i class="fa fa-2x fa-power-off"></i>';
+      this.buttons[4].classList.add('active');
 
       // enable control buttons
       for (let i = 5; i < this.buttons.length; i += 1) {
@@ -132,13 +111,18 @@ class Simon {
         this.buttons[i].classList.add('hasactive');
       }
     // if power is off
-    } else if (this.powerState === false) {
+    } else if (!this.powerState) {
+      this.resetGame();
+
       // disable the flashing of count
       clearInterval(this.flashTimer);
 
+      // toggle strict mode off
+      if (this.strictMode) { this.toggleStrictMode(); }
+
       // change button text to 'off'; turn button light off
-      powerButton.innerHTML = 'Off<br><i class="fa fa-2x fa-power-off"></i>';
-      powerButton.classList.remove('active');
+      this.buttons[4].innerHTML = 'Off<br><i class="fa fa-2x fa-power-off"></i>';
+      this.buttons[4].classList.remove('active');
 
       // disable control buttons
       for (let i = 5; i < this.buttons.length; i += 1) {
@@ -149,22 +133,39 @@ class Simon {
     }
   }
 
+
+  /* *****************
+      BUTTON HANDLING
+     ***************** */
+  // handles what happens when any control button is pressed
+  controlButtonPressed(buttonPressed) {
+    if (buttonPressed === 'power') {
+      this.togglePowerState();
+    } else if (buttonPressed === 'start') {
+      this.toggleGameStarted();
+    } else if (buttonPressed === 'strict') {
+      this.toggleStrictMode();
+    } else if (buttonPressed === 'count') {
+      // do something?
+    }
+  }
+
   // handles simon class methods get called depending on which button is pressed
   buttonHandler(button) {
     console.log(button);
     switch (button) {
       // game buttons
       case 'green':
-        this.gameButtonPressed('g');
+        this.addToPlayerMoves('g');
         break;
       case 'red':
-        this.gameButtonPressed('r');
+        this.addToPlayerMoves('r');
         break;
       case 'yellow':
-        this.gameButtonPressed('y');
+        this.addToPlayerMoves('y');
         break;
       case 'blue':
-        this.gameButtonPressed('b');
+        this.addToPlayerMoves('b');
         break;
       // control buttons
       case 'c-blue':
@@ -185,15 +186,140 @@ class Simon {
     }
   }
 
+
+  /* *************
+      GAME LOGIC
+     ************ */
+  // player input?
+  clearPlayerMoves() {
+    this.playerMoves = [];
+  }
+
+  addToPlayerMoves(color) {
+    this.playerMoves.push(color);
+    this.playerTurn(color);
+  }
+
+  playerTurn(x) {
+    if (this.playerMoves[this.playerMoves.length - 1] !== this.currentString[this.playerMoves.length - 1]) {
+      if (this.strictMode) {
+        this.resetGame();
+        this.addCount();
+      } else {
+        this.showPattern();
+      }
+    } else {
+      this.playGame(x);
+      const check = this.playerMoves.length === this.currentString.length;
+
+      if (check) {
+        if (this.roundCount === 20) {
+          // you win
+        } else {
+          this.addCount();
+        }
+      }
+    }
+  }
+
+  playGame(color) {
+    let audioClone = '';
+    if (color === 'g') {
+      this.buttons[0].classList.add('active');
+      audioClone = this.greenAudio;
+    } else if (color === 'r') {
+      this.buttons[1].classList.add('active');
+      audioClone = this.redAudio;
+    } else if (color === 'y') {
+      this.buttons[2].classList.add('active');
+      audioClone = this.yellowAudio;
+    } else if (color === 'b') {
+      this.buttons[3].classList.add('active');
+      audioClone = this.blueAudio;
+    }
+
+    audioClone.play();
+
+    for (let i = 0; i < 4; i += 1) {
+      setTimeout(() => { this.buttons[i].classList.remove('active'); }, 300);
+    }
+  }
+
+  showPattern() {
+    for (let j = 0; j < 4; j += 1) {
+      this.buttons[j].disabled = true;
+    }
+
+    let i = 0;
+    const moves = setInterval(() => {
+      this.playGame(this.currentString[i]);
+      i += 1;
+      if (i >= this.currentString.length) {
+        clearInterval(moves);
+      }
+    }, this.gameSpeed);
+
+    for (let j = 0; j < 4; j += 1) {
+      this.buttons[j].disabled = false;
+    }
+
+    this.clearPlayerMoves();
+  }
+
+  generateMove() {
+    this.currentString += this.gameSeed.slice(0, 1);
+    this.showPattern();
+  }
+
+  addCount() {
+    this.roundCount += 1;
+    document.getElementById('simon-points').innerText = Simon.formatRoundNumber(this.roundCount);
+    this.generateMove();
+  }
+
+  // resets everything to default
+  resetGame() {
+    // clear game seeds
+    this.gameSeed = '';
+    this.currentString = '';
+
+    if (this.gameStarted) {
+      this.toggleGameStarted();
+      this.flashCount();
+      document.getElementById('simon-points').innerHTML = '--';
+      // delayed set to default in-case point flashing causes issues
+      setTimeout(() => { document.getElementById('simon-points').innerHTML = '--'; }, 525);
+      this.flashTimer = setInterval(() => { this.flashCount(); }, 1000);
+    }
+  }
+
+  // generates a game string
+  generateGameSeed() {
+    // clear existing seed
+    this.gameSeed = '';
+
+    // generate new game seed
+    for (let i = 0; i < 20; i += 1) {
+      this.gameSeed += this.gameSeedValues[Math.floor(Math.random() * 4)];
+    }
+  }
+
+
+  /* **************
+      FANCY LIGHTS
+     ************** */
   // flashes count until game is started
   flashCount() {
+    // stores simon game object for use inside of setTimeout
     const that = this;
 
-    console.log('tick');
-
-    if (this.powerState && !this.gameStart) {
+    // flash count only if power state is on and a game is not running
+    if (this.powerState && !this.gameStarted) {
       setTimeout(() => { that.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-points">&nbsp&nbsp</span>'; }, 0);
-      setTimeout(() => { that.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-points">--</span>'; }, 650);
+      setTimeout(() => { that.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-points">--</span>'; }, 500);
+    // if a game is running or the power is off clear the interval so it stops calling this method
+    } else {
+      clearInterval(this.flashTimer);
     }
   }
 
@@ -233,6 +359,20 @@ class Simon {
     // fix power button light depending on power state (is there a better way to write this line?)
     setTimeout(() => { that.powerState ? enableLight(4) : disableLight(4); }, 450); // eslint-disable-line
   }
+
+  /* ****************
+      STATIC METHODS
+     **************** */
+  // formats the round number to always have two digits (00 through 20)
+  static formatRoundNumber(round) {
+    // if less than 10 (0 through 9)
+    if (round < 10) {
+      // add 0 to front of number
+      return `0${round}`;
+    }
+    // otherwise return the round as a string
+    return round.toString();
+  }
 }
 
 
@@ -241,6 +381,7 @@ class Simon {
    *************************************** */
 // creates a simon class object
 const simon = new Simon();
+console.log(simon);
 
 // stores HTMLCollection of all buttons in variable 'buttons'
 const buttons = document.getElementsByTagName('button');
