@@ -47,11 +47,16 @@ class Simon {
 
     // audio files for each button; and error
     this.audio = {
-      g: new Audio('../media/simonSound1.mp3'),
-      r: new Audio('../media/simonSound2.mp3'),
-      y: new Audio('../media/simonSound3.mp3'),
-      b: new Audio('../media/simonSound4.mp3'),
-      error: new Audio('../media/bzzzt.mp3'),
+      g: new Audio('https://s3.amazonaws.com/freecodecamp/simonSound1.mp3'),
+      r: new Audio('https://s3.amazonaws.com/freecodecamp/simonSound2.mp3'),
+      y: new Audio('https://s3.amazonaws.com/freecodecamp/simonSound3.mp3'),
+      b: new Audio('https://s3.amazonaws.com/freecodecamp/simonSound4.mp3'),
+
+      // g: new Audio('../media/simonSound1.mp3'),
+      // r: new Audio('../media/simonSound2.mp3'),
+      // y: new Audio('../media/simonSound3.mp3'),
+      // b: new Audio('../media/simonSound4.mp3'),
+      // error: new Audio('../media/bzzzt.mp3'),
     };
 
     this.createButtonListeners();
