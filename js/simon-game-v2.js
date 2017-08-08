@@ -161,7 +161,7 @@ class Simon {
 
     // handles the count button
     const countButtonHandler = function () {
-      // !!!!!!!!!!!!!!!!!!do something
+      // think of something the green control button can do
     }.bind(this); // eslint-disable-line
 
     // call the appropriate function based on the button
@@ -277,15 +277,8 @@ class Simon {
     // add one to the round counter
     this.roundCount += 1;
 
-    if (this.roundCount === 5) {
-      this.gameSpeed = 1000;
-    } else if (this.roundCount === 10) {
-      this.gameSpeed = 800;
-    } else if (this.roundCount === 15) {
-      this.gameSpeed = 600;
-    } else if (this.roundCount === 18) {
-      this.gameSpeed = 500;
-    }
+    // increase speed every round
+    this.gameSpeed -= 35;
 
     // update round counter DOM element; one is delayed just incase flashCount() un-does this
     document.getElementById('simon-rounds').innerText = Simon.formatRoundNumber(this.roundCount);
@@ -378,7 +371,7 @@ class Simon {
     } else if (this.playerInput.length === this.computerInput.length) {
       // if the round count is at 20 the player wins!
       if (this.roundCount === 20) {
-        // you win!!!!!!!!!!! (insert winning method here)
+        this.playerVictory();
       // otherwise go to the next round
       } else {
         this.addRoundCount();
@@ -409,6 +402,24 @@ class Simon {
 
   // handles what happens when the player wins
   playerVictory() {
+    // stores final color
+    const finalColor = this.computerInput[this.computerInput.length - 1];
+
+    // change round counter text
+    document.getElementById('simon-rounds').innerText = 'WIN';
+
+    // spam the final color a few times as a victory tune
+    setTimeout(() => { this.playGame(finalColor); }, 0);
+    setTimeout(() => { this.playGame(finalColor); }, 450);
+    setTimeout(() => { this.playGame(finalColor); }, 900);
+    setTimeout(() => { this.playGame(finalColor); }, 1350);
+    setTimeout(() => { this.playGame(finalColor); }, 1800);
+    setTimeout(() => { this.playGame(finalColor); }, 2250);
+    setTimeout(() => { this.playGame(finalColor); }, 2700);
+    setTimeout(() => { this.playGame(finalColor); }, 3150);
+
+    // set audio back to silence (mobile)
+    setTimeout(() => { document.getElementById('fake-audio').src = silenceDataURL; }, 3600);
   }
 
 
@@ -522,21 +533,10 @@ const simon = new Simon(); // eslint-disable-line
 
 /* *************************************************************************************
     TODO:
-      - When power button is pressed:
-        + Short light show
-          = Large-green clockwise, small-blue clockwise, small-blue stays lit
-        + Flash '--' on count button
-          = Stops flashing / goes solid once game starts
-
-      - Switch audio to AudioContext sounds (AudioContext.createOscillator())
-        + (https://developer.mozilla.org/en-US/docs/Web/API/AudioContext)
-
       - Possibly adjust button colors
         + make lit up buttons stand out more
 
-      - On victory spam last color a few times then change count to '**'
-
       - set time limit on user turn?
 
-      - speed up pattern as the player progresses
+      - improve mobile performance somehow
    ************************************************************************************* */
