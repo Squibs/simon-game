@@ -1,3 +1,4 @@
+/* global greenDataURL, redDataURL, yellowDataURL, blueDataURL, errorDataURL, silenceDataURL */
 /* ******************************************************************
     SIMON GAME OBJECT V2:
       - Features a stunning 8 buttons:
@@ -31,9 +32,8 @@ class Simon {
     this.playerInput = ''; // stores what the player has entered
     this.computerInput = ''; // controls the current stage of the game
     this.flashTimer = ''; // stores flashInterval
-    this.patternTimer = ''; // stores patternInterval
     this.roundCount = 0; // counts which roud the player is on
-    this.gameSpeed = 800; // how fast the game pattern will play (in milliseconds)
+    this.gameSpeed = 1250; // how fast the game pattern will play (in milliseconds)
 
     // stores HTMLCollection of all buttons
     this.buttons = document.getElementsByTagName('button');
@@ -45,19 +45,11 @@ class Simon {
       strictMode: false, // controls whether or not strict mode is enabled
     };
 
-    // audio files for each button; and error
-    this.audio = {
-      g: new Audio('https://s3.amazonaws.com/freecodecamp/simonSound1.mp3'),
-      r: new Audio('https://s3.amazonaws.com/freecodecamp/simonSound2.mp3'),
-      y: new Audio('https://s3.amazonaws.com/freecodecamp/simonSound3.mp3'),
-      b: new Audio('https://s3.amazonaws.com/freecodecamp/simonSound4.mp3'),
-
-      // g: new Audio('../media/simonSound1.mp3'),
-      // r: new Audio('../media/simonSound2.mp3'),
-      // y: new Audio('../media/simonSound3.mp3'),
-      // b: new Audio('../media/simonSound4.mp3'),
-      // error: new Audio('../media/bzzzt.mp3'),
-    };
+    // create an audio source with silent audio
+    const audio = document.createElement('audio');
+    audio.src = silenceDataURL;
+    audio.id = 'fake-audio';
+    document.body.appendChild(audio);
 
     this.createButtonListeners();
     this.disableGameButtons(true);
@@ -84,7 +76,7 @@ class Simon {
           this.handleControlButtons(button.value.split('').shift());
           break;
         default:
-          alert(button, 'This button is not being handled correctly');
+          alert(button, 'This button is not being handled correctly'); // eslint-disable-line
           break;
       }
     }.bind(this);
@@ -107,19 +99,24 @@ class Simon {
     // add the color pressed to the player input string (to compare against the seed)
     this.playerInput += button;
 
-    // clone the original audio node for the passed color and play it (allows audio overlap)
-    const cloneAudio = this.audio[button].cloneNode(true);
-    cloneAudio.play();
+    // // clone the original audio node for the passed color and play it (allows audio overlap)
+    // const cloneAudio = this.audio[button].cloneNode(true);
+    // cloneAudio.play();
+
+    Simon.playAudio(button, false);
 
     this.playerTurn();
-    console.log(this);
   }
 
   // handles option / control buttons
   handleControlButtons(button) {
     // handles the power button
     const powerButtonHandler = function () {
+      // toggle the power state
       this.toggleControlState('powerState');
+
+      // play empty audio to allow mobile audio to work
+      document.getElementById('fake-audio').play();
 
       // stores power button DOM element
       const power = this.buttons[4];
@@ -147,12 +144,13 @@ class Simon {
 
       // if the game is started
       if (this.toggles.gameStarted) {
-        // start the game
+        // start the game & change yellow control button text to 'restart'
+        document.getElementById('control-yellow-button').innerHTML = 'Restart<br><i class="fa fa-2x fa-refresh"></i>';
         this.startGame();
-
-      // if the game button is pressed while a game is already started
+      // if the start game button is pressed while a game is already started
       } else {
-        // !!!!!!!!!!!!!!!!!!!!do something
+        // press this button again to restart / start a new game
+        this.handleControlButtons('y');
       }
     }.bind(this);
 
@@ -164,7 +162,7 @@ class Simon {
     // handles the count button
     const countButtonHandler = function () {
       // !!!!!!!!!!!!!!!!!!do something
-    }.bind(this);
+    }.bind(this); // eslint-disable-line
 
     // call the appropriate function based on the button
     if (button === 'b') {
@@ -246,8 +244,8 @@ class Simon {
         this.playerInput = '';
         this.gameSeed = '';
         this.roundCount = 0;
-        this.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-points">--</span>';
-        clearInterval(this.patternTimer);
+        this.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-rounds">--</span>';
+        this.buttons[5].innerHTML = 'Start<br><i class="fa fa-2x fa-play-circle"></i>';
         clearInterval(this.flashTimer);
       }
     }
@@ -271,15 +269,29 @@ class Simon {
     }
 
     // add one to the round cunter
-    console.log(this.gameSeed);
     this.addRoundCount();
   }
 
   // adds to the round counter
   addRoundCount() {
-    // add one to the round counter; update round counter DOM element; generate a move
+    // add one to the round counter
     this.roundCount += 1;
-    document.getElementById('simon-points').innerText = Simon.formatRoundNumber(this.roundCount);
+
+    if (this.roundCount === 5) {
+      this.gameSpeed = 1000;
+    } else if (this.roundCount === 10) {
+      this.gameSpeed = 800;
+    } else if (this.roundCount === 15) {
+      this.gameSpeed = 600;
+    } else if (this.roundCount === 18) {
+      this.gameSpeed = 500;
+    }
+
+    // update round counter DOM element; one is delayed just incase flashCount() un-does this
+    document.getElementById('simon-rounds').innerText = Simon.formatRoundNumber(this.roundCount);
+    setTimeout(() => { document.getElementById('simon-rounds').innerText = Simon.formatRoundNumber(this.roundCount); }, 500);
+
+    // generate a move, delayed just a bit to allow the player to prepare
     setTimeout(() => { this.generateMove(); }, 150);
   }
 
@@ -287,7 +299,8 @@ class Simon {
   generateMove() {
     // pull next move from already generated game seed
     this.computerInput += this.gameSeed.slice(0, 1);
-    this.gameSeed = this.gameSeed.slice(1, this.gameSeed.length - 1);
+    this.gameSeed = this.gameSeed.slice(1, this.gameSeed.length);
+    console.log(`Round${this.roundCount}`, `Seed Length${this.gameSeed.length}`);
     this.displayRoundPattern();
   }
 
@@ -300,17 +313,15 @@ class Simon {
     let i = 0;
 
     // display each bit of the pattern based on gameSpeed variable
-    this.patternTimer = setInterval(() => {
+    const patternTimer = setInterval(() => {
       this.playGame(this.computerInput[i]);
       i += 1;
 
       // once pattern has completely played out
       if (i >= this.computerInput.length) {
         // stop the interval (stops pattern from playing)
-        clearInterval(this.patternTimer);
-
-        // re-enable player controls
-        this.disableGameButtons(false);
+        clearInterval(patternTimer);
+        setTimeout(() => { this.disableGameButtons(false); }, 300);
       }
     }, this.gameSpeed);
 
@@ -320,10 +331,10 @@ class Simon {
 
   // plays out the pattern based on the computerInput variable
   playGame(color) {
-    console.log('playGame tick');
-    // clone the original audio node for the passed color and play it (allows audio overlap)
-    const cloneAudio = this.audio[color].cloneNode(true);
-    cloneAudio.play();
+    console.log('playGame tick', this);
+
+    // play appropriate audio tone
+    Simon.playAudio(color, true);
 
     // light up the appropriate button
     if (color === 'g') {
@@ -347,15 +358,21 @@ class Simon {
     // stores length of the playerInput variable to make 'if' statement readable
     const length = this.playerInput.length - 1;
 
+    // prevent additional inputs
+    if (this.playerInput.length === this.computerInput.length) {
+      this.disableGameButtons(true);
+    }
+
     // if incorrect piece of the pattern was entered
     if (this.playerInput[length] !== this.computerInput[length]) {
-      // if strict mode is enabled
+      // if strict mode is enabled; display error, then start new game
       if (this.toggles.strictMode) {
-        // !!!!!!!!!!!!insert mistake handling method here
-        this.startGame();
-      // reshow the pattern to the player
+        this.playerMistake();
+        setTimeout(() => { this.startGame(); }, 1600);
+        // display mistake then reshow the pattern to the player
       } else {
-        this.displayRoundPattern();
+        this.playerMistake();
+        setTimeout(() => { this.displayRoundPattern(); }, 1600);
       }
     // if entire player input was correct and the length matches that of the computer's input
     } else if (this.playerInput.length === this.computerInput.length) {
@@ -369,14 +386,40 @@ class Simon {
     }
   }
 
+  // handles what happens when the player makes a mistake
+  playerMistake() {
+    // disable player input
+    this.disableGameButtons(true);
+
+    // // play error sound
+    // this.audio.error.play();
+    Simon.playAudio('e', true);
+
+    // change count to display '!!'
+    const flashCount = document.getElementById('simon-rounds');
+    flashCount.innerText = '!!';
+    setTimeout(() => { flashCount.innerHTML = '&nbsp;'; }, 200);
+    setTimeout(() => { flashCount.innerText = '!!'; }, 400);
+    setTimeout(() => { flashCount.innerHTML = '&nbsp;'; }, 600);
+    setTimeout(() => { flashCount.innerText = '!!'; }, 800);
+    setTimeout(() => { flashCount.innerHTML = '&nbsp;'; }, 1000);
+    setTimeout(() => { flashCount.innerText = '!!'; }, 1200);
+    setTimeout(() => { flashCount.innerText = Simon.formatRoundNumber(this.roundCount); }, 1600);
+  }
+
+  // handles what happens when the player wins
+  playerVictory() {
+  }
+
+
   /* *********************
       FANCY LIGHT METHODS
      ********************* */
   // flashes the round count until the game is started
   flashCount() {
     if (this.toggles.powerState && !this.toggles.gameStarted) {
-      setTimeout(() => { this.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-points">&nbsp&nbsp</span>'; }, 0);
-      setTimeout(() => { this.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-points">--</span>'; }, 500);
+      setTimeout(() => { this.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-rounds">&nbsp&nbsp</span>'; }, 0);
+      setTimeout(() => { this.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-rounds">--</span>'; }, 500);
     } else {
       clearInterval(this.flashTimer);
     }
@@ -427,6 +470,46 @@ class Simon {
     if (round < 10) { return `0${round}`; }
     return round.toString();
   }
+
+  static playAudio(color, automated) {
+    const audio = document.createElement('audio');
+    const fakeAudio = document.getElementById('fake-audio');
+
+    if (!automated) {
+      if (color === 'g') {
+        audio.src = 'https://s3.amazonaws.com/freecodecamp/simonSound1.mp3';
+      } else if (color === 'r') {
+        audio.src = 'https://s3.amazonaws.com/freecodecamp/simonSound2.mp3';
+      } else if (color === 'y') {
+        audio.src = 'https://s3.amazonaws.com/freecodecamp/simonSound3.mp3';
+      } else if (color === 'b') {
+        audio.src = 'https://s3.amazonaws.com/freecodecamp/simonSound4.mp3';
+      }
+
+      audio.addEventListener('ended', function () {
+        document.body.removeChild(this);
+      }, false);
+
+      document.body.appendChild(audio);
+
+      audio.play();
+    } else if (automated) {
+      if (color === 'g') {
+        fakeAudio.src = greenDataURL;
+      } else if (color === 'r') {
+        fakeAudio.src = redDataURL;
+      } else if (color === 'y') {
+        fakeAudio.src = yellowDataURL;
+      } else if (color === 'b') {
+        fakeAudio.src = blueDataURL;
+      } else if (color === 'e') {
+        fakeAudio.src = errorDataURL;
+      }
+      document.body.appendChild(fakeAudio);
+
+      fakeAudio.play();
+    }
+  }
 }
 
 
@@ -434,7 +517,7 @@ class Simon {
     CREATE GAME OBJECT & BUTTON LISTENERS
    *************************************** */
 // creates a simon class objects
-const simon = new Simon();
+const simon = new Simon(); // eslint-disable-line
 
 
 /* *************************************************************************************
@@ -452,4 +535,8 @@ const simon = new Simon();
         + make lit up buttons stand out more
 
       - On victory spam last color a few times then change count to '**'
+
+      - set time limit on user turn?
+
+      - speed up pattern as the player progresses
    ************************************************************************************* */

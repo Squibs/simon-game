@@ -42,8 +42,15 @@ footer a {
 .cursor { cursor: pointer; }
 
 /* fixes */
-button:focus {outline: none; } /* removes android button highlight */
+button:focus { outline: none; } /* removes android button highlight */
 button { -webkit-tap-highlight-color: transparent; } /* removes iOS button highlight */
+button::-moz-focus-inner { border: 0; } /* removes firefox button highligh */
+.disable-select { /* prevent selection of button text when playing */
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
 
 
 /* ***********************
