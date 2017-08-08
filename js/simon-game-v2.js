@@ -246,6 +246,7 @@ class Simon {
         this.roundCount = 0;
         this.buttons[7].innerHTML = 'Count<br><span class="fa fa-2x" id="simon-rounds">--</span>';
         this.buttons[5].innerHTML = 'Start<br><i class="fa fa-2x fa-play-circle"></i>';
+        document.getElementById('fake-audio').src = silenceDataURL;
         clearInterval(this.flashTimer);
       }
     }
