@@ -1,7 +1,7 @@
 # Simon Game
-A Simon Says game I have created while going through the advanced front end development project challenges at https://freeCodeCamp.com
+A Simon Says game I have created while going through the advanced front end development project challenges at www.freeCodeCamp.org
 
-## [Front End Development Projects](https://github.com/Squibs/freeCodeCamp/tree/master/Front%20End%20Development%20Certification#simon-game) (Go Back)
+## [Front End Development Projects](https://github.com/Squibs/freeCodeCamp#freecodecamp) (Go Back to My freeCodeCamp Repository)
  
 <a href="https://squibs.github.io/simon-game/" target="_blank"><img src="img/screenshot-simon-game.png" height="600" alt="Screenshot of my Simon Game project / website"/></a>
 
